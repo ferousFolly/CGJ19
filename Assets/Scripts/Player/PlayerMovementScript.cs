@@ -17,13 +17,13 @@ public class PlayerMovementScript : MonoBehaviour
     private bool landed;
     public Transform groundCheck;
     public float areaRadius;
-    public LayerMask whatIsGround;
+    public LayerMask groundLayer;
 
     // Extra smooth jump stuff
-    public float fJumpPressRemeberTime;
-    private float fJumpPressRemeber;
-    public float fGroundedRemeberTime;
-    private float fGroundedRemeber;
+    public float fJumpPressRememberTime;
+    private float fJumpPressRemember;
+    public float fGroundedRememberTime;
+    private float fGroundedRemember;
     public float fCutJumpHeight;
 
     // Fix collisions
@@ -50,27 +50,27 @@ public class PlayerMovementScript : MonoBehaviour
         {
             //if (!landed) Instantiate(landParticles);
             landed = true;
-            fGroundedRemeber = fGroundedRemeberTime;
+            fGroundedRemember = fGroundedRememberTime;
         }
         else landed = false;
 
         // Jumping
-        isGrounded = Physics2D.OverlapBox(groundCheck.position, transform.localScale * areaRadius, 0, whatIsGround);
+        isGrounded = (bool)Physics2D.OverlapBox(groundCheck.position, transform.localScale * areaRadius, 0, groundLayer);
 
-        fJumpPressRemeber -= Time.deltaTime;
-        fGroundedRemeber -= Time.deltaTime;
+        fJumpPressRemember -= Time.deltaTime;
+        fGroundedRemember -= Time.deltaTime;
 
 
         if (Input.GetButtonDown("Jump"))
         {
-            fJumpPressRemeber = fJumpPressRemeberTime;
+            fJumpPressRemember = fJumpPressRememberTime;
         }
 
 
-        if (fJumpPressRemeber > 0 && fGroundedRemeber > 0)
+        if (fJumpPressRemember > 0 && fGroundedRemember > 0)
         {
-            fJumpPressRemeber = 0;
-            fGroundedRemeber = 0;
+            fJumpPressRemember = 0;
+            fGroundedRemember = 0;
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             //Instantiate(jumpParticles);
         }
@@ -101,7 +101,6 @@ public class PlayerMovementScript : MonoBehaviour
     {
         //isGrounded = Physics2D.OverlapCircle(groundCheck.position, areaRadius, whatIsGround);
 
-        
         rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
 
         if (!facingRight && moveInput > 0)

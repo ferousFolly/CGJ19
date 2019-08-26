@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+enum Direction { up, right, down, left }
+
 public class RetractableSpikeTrap : MonoBehaviour
 {
     private bool isActive;
@@ -11,13 +13,8 @@ public class RetractableSpikeTrap : MonoBehaviour
     public float delayTime = 0.1f;
     public float moveDistance = 1f;
     public float triggerDistance = 1f;
-    /*
-     0 = up
-     1 = right
-     2 = down
-     3 = left
-    */
-    public int direction = 0;
+
+    [SerializeField] private Direction direction = Direction.up;
 
     private Vector2 pos;
     private float currentActiveTime;
@@ -38,20 +35,30 @@ public class RetractableSpikeTrap : MonoBehaviour
     void Update()
     {
         if (Vector2.Distance(player.position, transform.position) < triggerDistance && isActive == false)
-        {
             isActive = true;
-        }
 
         if (isActive == true)
         {
             curretnDelayTime -= Time.deltaTime;
             if (curretnDelayTime < 0)
             {
-                if (direction == 0) transform.position = new Vector2(pos.x, pos.y + moveDistance);
-                else if (direction == 1) transform.position = new Vector2(pos.x + moveDistance, pos.y);
-                else if (direction == 2) transform.position = new Vector2(pos.x, pos.y - moveDistance);
-                else if (direction == 3) transform.position = new Vector2(pos.x - moveDistance, pos.y);
-
+                switch (direction)
+                {
+                    case Direction.up:
+                        transform.position = new Vector2(pos.x, pos.y + moveDistance);
+                        break;
+                    case Direction.right:
+                        transform.position = new Vector2(pos.x + moveDistance, pos.y);
+                        break;
+                    case Direction.down:
+                        transform.position = new Vector2(pos.x, pos.y - moveDistance);
+                        break;
+                    case Direction.left:
+                        transform.position = new Vector2(pos.x - moveDistance, pos.y);
+                        break;
+                    default:
+                        break;
+                }
 
                 trapActive = true;
                 currentActiveTime -= Time.deltaTime;
