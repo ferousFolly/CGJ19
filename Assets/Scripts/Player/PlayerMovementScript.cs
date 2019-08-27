@@ -30,6 +30,10 @@ public class PlayerMovementScript : MonoBehaviour
     EdgeCollider2D groundCollider;
     BoxCollider2D jumpCollider;
 
+    // Platform
+    private bool jumpThurCollision;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -79,18 +83,17 @@ public class PlayerMovementScript : MonoBehaviour
         if (Input.GetButtonUp("Jump") && rb.velocity.y > 0) rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * fCutJumpHeight);
 
         // Chage collidiers
-        if (rb.velocity.y > 0)
+        if (jumpThurCollision == true)
         {
             jumpCollider.enabled = true;
             groundCollider.enabled = false;
-
+        }
+        else if (rb.velocity.y > 0)
+        {
+            jumpCollider.enabled = true;
+            groundCollider.enabled = false;
         }
         else
-        {
-            jumpCollider.enabled = false;
-            groundCollider.enabled = true;
-        }
-        if (Input.GetButton("Down"))
         {
             jumpCollider.enabled = false;
             groundCollider.enabled = true;
@@ -120,4 +123,21 @@ public class PlayerMovementScript : MonoBehaviour
         Scaler.x *= -1;
         transform.localScale = Scaler;
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "JumpThurPlatform")
+        {
+            jumpThurCollision = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.tag == "JumpThurPlatform")
+        {
+            jumpThurCollision = false;
+        }
+    }
+
 }
