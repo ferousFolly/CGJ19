@@ -58,12 +58,8 @@ public class PlayerMovementScript : MonoBehaviour {
             jumpCollider.enabled = true;
             groundCollider.enabled = false;
         }
-        else {
-            jumpCollider.enabled = false;
-            groundCollider.enabled = true;
-        }
-
-        if (Input.GetButton("Down")) {
+        else
+        {
             jumpCollider.enabled = false;
             groundCollider.enabled = true;
         }
