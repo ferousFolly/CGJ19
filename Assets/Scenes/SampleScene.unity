@@ -203,14 +203,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 7.5
   jumpForce: 15
-  groundCheck: {fileID: 963685459}
-  areaRadius: 0.98
+  groundChecker: {fileID: 575841635}
+  groundCollisionDistance: 0.6
+  debugGroundCollision: 0
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
-  groundCheckDistance: 0
-  debugGroundCollision: 0
-  fJumpPressRememberTime: 0.15
+  fCoyoteTime: 0.15
   fGroundedRememberTime: 0.15
   fCutJumpHeight: 0.5
 --- !u!212 &19839650
@@ -291,18 +290,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b834da65d41f17248b39e142ee944a57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 7.5
-  jumpForce: 15.74
-  groundChecker: {fileID: 0}
-  groundCollisionDistance: 0.52
-  debugGroundCollision: 1
-  areaRadius: 1
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  fCoyoteTime: 0.1
-  fGroundedRememberTime: 0
-  fCutJumpHeight: 0.5
 --- !u!68 &19839653
 EdgeCollider2D:
   m_ObjectHideFlags: 0
@@ -624,7 +611,7 @@ GameObject:
   - component: {fileID: 575841639}
   - component: {fileID: 575841638}
   m_Layer: 8
-  m_Name: Gameplay
+  m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
