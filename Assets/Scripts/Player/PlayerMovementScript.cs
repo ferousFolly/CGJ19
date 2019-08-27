@@ -87,6 +87,11 @@ public class PlayerMovementScript : MonoBehaviour
             jumpCollider.enabled = true;
             groundCollider.enabled = false;
         }
+        else
+        {
+            jumpCollider.enabled = false;
+            groundCollider.enabled = true;
+        }
     }
 
     private void FixedUpdate()

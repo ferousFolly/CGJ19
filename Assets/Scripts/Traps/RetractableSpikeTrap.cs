@@ -48,7 +48,7 @@ public class RetractableSpikeTrap : MonoBehaviour
                         transform.position = new Vector2(pos.x, transform.position.y + ((pos.y + moveDistance) - transform.position.y) * 0.5f);
                         break;
                     case Direction.right:
-                        transform.position = new Vector2(transform.position.x + ((pos.x + moveDistance) - transform.position.x), pos.y);
+                        transform.position = new Vector2(transform.position.x + ((pos.x + moveDistance) - transform.position.x) * 0.5f, pos.y);
                         break;
                     case Direction.down:
                         transform.position = new Vector2(pos.x, transform.position.y + ((pos.y - moveDistance) - transform.position.y) * 0.5f);
@@ -62,13 +62,17 @@ public class RetractableSpikeTrap : MonoBehaviour
 
                 trapActive = true;
                 currentActiveTime -= Time.deltaTime;
-                if (currentActiveTime < 0)
+
+                if (Vector2.Distance(player.position, transform.position) > triggerDistance)
                 {
-                    transform.position = new Vector2(transform.position.x + (pos.x - transform.position.x) * 0.5f, transform.position.y + (pos.y - transform.position.y) * 0.5f);
-                    isActive = false;
-                    trapActive = false;
-                    curretnDelayTime = delayTime;
-                    currentActiveTime = activeTime;
+                    if (currentActiveTime < 0)
+                    {
+                        transform.position = new Vector2(transform.position.x + (pos.x - transform.position.x) * 0.5f, transform.position.y + (pos.y - transform.position.y) * 0.5f);
+                        isActive = false;
+                        trapActive = false;
+                        curretnDelayTime = delayTime;
+                        currentActiveTime = activeTime;
+                    }
                 }
             }
         }
