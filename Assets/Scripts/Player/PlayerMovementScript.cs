@@ -52,8 +52,7 @@ public class PlayerMovementScript : MonoBehaviour
         // When player hits ground
         if (isGrounded)
         {
-            //if (!landed) Instantiate(landParticles);
-            landed = true;
+            //if (!landed) Instantiate(landParticles) landed = true;
             fGroundedRemember = fGroundedRememberTime;
         }
         else landed = false;
@@ -87,16 +86,6 @@ public class PlayerMovementScript : MonoBehaviour
         {
             jumpCollider.enabled = true;
             groundCollider.enabled = false;
-        }
-        else if (rb.velocity.y > 0)
-        {
-            jumpCollider.enabled = true;
-            groundCollider.enabled = false;
-        }
-        else
-        {
-            jumpCollider.enabled = false;
-            groundCollider.enabled = true;
         }
     }
 
