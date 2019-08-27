@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovementScript : MonoBehaviour
-{
+public class PlayerMovementScript : MonoBehaviour {
     private Rigidbody2D rb;
 
     // Horizontal movement
@@ -14,130 +13,108 @@ public class PlayerMovementScript : MonoBehaviour
 
     // Jumping
     public static bool isGrounded;
-    private bool landed;
-    public Transform groundCheck;
-    public float areaRadius;
+    public Transform groundChecker;
+    public float groundCollisionDistance;
+    public bool debugGroundCollision;
     public LayerMask groundLayer;
 
     // Extra smooth jump stuff
-    public float fJumpPressRememberTime;
-    private float fJumpPressRemember;
+    public float fCoyoteTime;
     public float fGroundedRememberTime;
-    private float fGroundedRemember;
     public float fCutJumpHeight;
+    private float fLastGrounded;
+    private float fLastJumpPress;
 
     // Fix collisions
     EdgeCollider2D groundCollider;
     BoxCollider2D jumpCollider;
 
-    // Platform
-    private bool jumpThurCollision;
-
-
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         rb = GetComponent<Rigidbody2D>();
         groundCollider = GetComponent<EdgeCollider2D>();
         jumpCollider = GetComponent<BoxCollider2D>();
-        landed = false;
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         // Horizontal movement
         moveInput = Input.GetAxisRaw("Horizontal");
 
         // When player hits ground
-        if (isGrounded)
-        {
-            //if (!landed) Instantiate(landParticles);
-            landed = true;
-            fGroundedRemember = fGroundedRememberTime;
+        if (IsGrounded()) {
+            fLastGrounded = Time.time; // store last time player was grounded
         }
-        else landed = false;
-
-        // Jumping
-        isGrounded = (bool)Physics2D.OverlapBox(groundCheck.position, transform.localScale * areaRadius, 0, groundLayer);
-
-        fJumpPressRemember -= Time.deltaTime;
-        fGroundedRemember -= Time.deltaTime;
-
-
-        if (Input.GetButtonDown("Jump"))
-        {
-            fJumpPressRemember = fJumpPressRememberTime;
+        if (Input.GetButtonDown("Jump")) {
+            fLastJumpPress = Time.time;
+            if (fLastGrounded >= Time.time - fCoyoteTime)
+                Jump();
         }
+        if (Input.GetButtonUp("Jump") && !IsGrounded()) // shorted jump when jump button not held
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * fCutJumpHeight);
 
-
-        if (fJumpPressRemember > 0 && fGroundedRemember > 0)
-        {
-            fJumpPressRemember = 0;
-            fGroundedRemember = 0;
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-            //Instantiate(jumpParticles);
-        }
-
-        // Fall when not jumping
-        if (Input.GetButtonUp("Jump") && rb.velocity.y > 0) rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * fCutJumpHeight);
-
-        // Chage collidiers
-        if (jumpThurCollision == true)
-        {
+        // Change collidiers
+        if (rb.velocity.y > 0) {
             jumpCollider.enabled = true;
             groundCollider.enabled = false;
         }
-        else if (rb.velocity.y > 0)
-        {
-            jumpCollider.enabled = true;
-            groundCollider.enabled = false;
+        else {
+            jumpCollider.enabled = false;
+            groundCollider.enabled = true;
         }
-        else
-        {
+
+        if (Input.GetButton("Down")) {
             jumpCollider.enabled = false;
             groundCollider.enabled = true;
         }
     }
 
-    private void FixedUpdate()
-    {
-        //isGrounded = Physics2D.OverlapCircle(groundCheck.position, areaRadius, whatIsGround);
-
-        rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
-
-        if (!facingRight && moveInput > 0)
-        {
-            Flip();
-        }
-        else if (facingRight && moveInput < 0)
-        {
-            Flip();
-        }
+    private void Jump() {
+        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        Debug.Log("jumped");
     }
 
-    void Flip()
-    {
+    private void FixedUpdate() {
+        rb.AddForce(new Vector2(moveInput * speed * 4, 0), ForceMode2D.Impulse);
+        rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x, -speed, speed), rb.velocity.y);
+        if (moveInput == 0) {
+            if (rb.velocity.x > 0)
+                rb.velocity = new Vector2(rb.velocity.x - 1, rb.velocity.y);
+            else if (rb.velocity.x < 0)
+                rb.velocity = new Vector2(rb.velocity.x + 1, rb.velocity.y);
+        }
+
+        if (!facingRight && moveInput > 0)
+            Flip();
+        else if (facingRight && moveInput < 0)
+            Flip();
+    }
+
+    void Flip() {
         facingRight = !facingRight;
         Vector3 Scaler = transform.localScale;
         Scaler.x *= -1;
         transform.localScale = Scaler;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.tag == "JumpThurPlatform")
-        {
-            jumpThurCollision = true;
-        }
+    private void JumpIfBuffered() {
+        if (fLastJumpPress >= Time.time - 0.4f)
+            Jump();
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.tag == "JumpThurPlatform")
-        {
-            jumpThurCollision = false;
-        }
-    }
+    bool IsGrounded() {
+        Vector2 position = transform.position;
+        Vector2 direction = Vector2.down;
+        float distance = groundCollisionDistance;
 
+        if (debugGroundCollision)
+            Debug.DrawRay(position, direction, Color.green); // show groundchecker ray
+
+        RaycastHit2D hit = Physics2D.Raycast(position, direction, distance, groundLayer);
+
+        if (hit.collider != null)
+            return true; // grounded
+
+        return false; // not grounded
+    }
 }
